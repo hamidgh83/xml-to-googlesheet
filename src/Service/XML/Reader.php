@@ -3,6 +3,7 @@
 namespace App\Service\XML;
 
 use Closure;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -18,6 +19,13 @@ class Reader
      */
     private array $items = [];
 
+    protected LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Load a given XML file.
      *
@@ -28,6 +36,8 @@ class Reader
     public function load(string $xmlFile): self
     {
         if (!$xmlContent = file_get_contents($xmlFile)) {
+            $this->logger->error(sprintf('Cannot read content from %s', $xmlFile));
+
             throw new RuntimeException('Cannot load the file content. Please check your file path and try again.');
         }
 
