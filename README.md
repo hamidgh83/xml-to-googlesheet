@@ -30,7 +30,7 @@ After installing composer packages you should configure the environment variable
 Before you try to run the command, you must create an empty google spreadsheet and share it with your service account email. Then copy the spreadsheet ID from the URL and run:
 
 ```bash
-docker exec xml-to-googlesheet bin/console xml:google:spreadshee <GOOGLESHEET_ID>
+docker exec xml-to-googlesheet bin/console xml:google:spreadshee <SPREADSHEET_ID>
 ```
 
 ## Running Tests
