@@ -14,12 +14,12 @@ class Reader
      */
     protected Crawler $crawler;
 
+    protected LoggerInterface $logger;
+
     /**
      * XML parsed items.
      */
     private array $items = [];
-
-    protected LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger)
     {
@@ -75,6 +75,14 @@ class Reader
     }
 
     /**
+     * Count parsed items.
+     */
+    public function count()
+    {
+        return count($this->getItems());
+    }
+
+    /**
      * Calls an anonymous function on each records of the parsed XML data.
      */
     public function each(Closure $callback): array
@@ -85,6 +93,27 @@ class Reader
         }
 
         return $results;
+    }
+
+    /**
+     * Get items keys.
+     */
+    public function getHeaders(): array
+    {
+        $iterableItems = $this->crawler->first();
+
+        if ($iterableItems->count() < 1) {
+            return false;
+        }
+
+        $headers = [];
+        foreach ($iterableItems as $item) {
+            foreach ($item->childNodes as $dom) {
+                $headers[] = $dom->nodeName;
+            }
+        }
+
+        return $headers;
     }
 
     /**
