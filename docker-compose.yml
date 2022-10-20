@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: xml-to-googlesheet
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    restart: on-failure
+    volumes:
+      - ".:/var/www"
+
