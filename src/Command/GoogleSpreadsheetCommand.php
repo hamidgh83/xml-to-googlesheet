@@ -79,12 +79,27 @@ class GoogleSpreadsheetCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * Creates a new sheet and adds headers.
+     *
+     * @param array  $headers Header values
+     * @param string $prefix  Sheet name prefix
+     *
+     * @return array Returns an array of sheet name and number of affected rows by header values
+     *
+     * @throws Exception Throws exception in case of failure
+     */
     private function newSheet(array $headers, string $prefix = 'Sheet'): array
     {
         static $index = 0;
-        $sheetName    = $this->spreadsheetClient->addSheet($prefix . ++$index);
-        $count        = $this->spreadsheetClient->update($sheetName . '!A1', $headers);
 
-        return [$sheetName, $count];
+        $sheetName = $prefix . ++$index;
+        if ($this->spreadsheetClient->addSheet($sheetName)) {
+            $count = $this->spreadsheetClient->update($sheetName . '!A1', $headers);
+
+            return [$sheetName, $count];
+        }
+
+        throw new \Exception('Cannot create new sheet.');
     }
 }

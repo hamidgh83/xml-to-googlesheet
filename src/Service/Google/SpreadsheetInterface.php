@@ -9,7 +9,7 @@ interface SpreadsheetInterface
 
     public function loadSpreadsheet(string $spreadsheetId);
 
-    public function addSheet(string $prefix): ?string;
+    public function addSheet(string $prefix): bool;
 
     public function update(string $sheet, array $values): int;
 }

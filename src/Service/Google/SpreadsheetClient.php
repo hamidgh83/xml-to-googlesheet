@@ -2,7 +2,6 @@
 
 namespace App\Service\Google;
 
-use Google\Client as GoogleClient;
 use Google\Exception as GoogleException;
 use Google\Service\Sheets as GoogleSheets;
 use Google\Service\Sheets\BatchUpdateSpreadsheetRequest;
@@ -56,10 +55,10 @@ class SpreadsheetClient implements SpreadsheetInterface
     /**
      * Creates a new sheet and returns its title.
      */
-    public function addSheet(string $name): ?string
+    public function addSheet(string $name): bool
     {
         if ($this->hasSheet($name)) {
-            return $name;
+            return true;
         }
 
         $service = new GoogleSheets($this->client);
@@ -71,11 +70,9 @@ class SpreadsheetClient implements SpreadsheetInterface
                 ],
             ]);
 
-            $response   = $service->spreadsheets->batchUpdate($this->getSpreadsheet()->spreadsheetId, $body);
-            $response   = $response->current();
-            $properties = $response->addSheet->properties;
+            $service->spreadsheets->batchUpdate($this->getSpreadsheet()->spreadsheetId, $body);
 
-            return $properties->title;
+            return true;
         } catch (GoogleException $e) {
             $this->logger->error(sprintf(
                 'Cannot create a new sheet titled %s. Reason: $s',
@@ -84,7 +81,7 @@ class SpreadsheetClient implements SpreadsheetInterface
             ));
         }
 
-        return null;
+        return false;
     }
 
     /**
