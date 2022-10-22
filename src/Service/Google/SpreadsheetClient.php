@@ -3,29 +3,22 @@
 namespace App\Service\Google;
 
 use Google\Exception as GoogleException;
-use Google\Service\Sheets as GoogleSheets;
 use Google\Service\Sheets\BatchUpdateSpreadsheetRequest;
 use Google\Service\Sheets\BatchUpdateValuesRequest;
 use Google\Service\Sheets\Spreadsheet;
 use Google\Service\Sheets\ValueRange;
-use Google_Client;
 use Psr\Log\LoggerInterface;
 
 class SpreadsheetClient implements SpreadsheetInterface
 {
-    protected Google_Client $client;
-
-    protected LoggerInterface $logger;
-
     private Spreadsheet $spreadsheet;
 
     private array $sheets;
 
-    public function __construct(Google_Client $client, LoggerInterface $logger)
-    {
-        $this->client = $client;
-        $this->logger = $logger;
-        $this->client->setScopes([GoogleSheets::SPREADSHEETS, GoogleSheets::DRIVE]);
+    public function __construct(
+        protected GoogleSheets $googleSheetsService,
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -33,9 +26,7 @@ class SpreadsheetClient implements SpreadsheetInterface
      */
     public function loadSpreadsheet(string $spreadsheetId): self
     {
-        $service = new GoogleSheets($this->client);
-
-        $this->spreadsheet = $service->spreadsheets->get($spreadsheetId);
+        $this->spreadsheet = $this->googleSheetsService->spreadsheets->get($spreadsheetId);
         $sheets            = $this->spreadsheet->getSheets();
         foreach ($sheets as $sheet) {
             $this->sheets[] = $sheet->properties->title;
@@ -61,8 +52,6 @@ class SpreadsheetClient implements SpreadsheetInterface
             return true;
         }
 
-        $service = new GoogleSheets($this->client);
-
         try {
             $body = new BatchUpdateSpreadsheetRequest([
                 'requests' => [
@@ -70,7 +59,10 @@ class SpreadsheetClient implements SpreadsheetInterface
                 ],
             ]);
 
-            $service->spreadsheets->batchUpdate($this->getSpreadsheet()->spreadsheetId, $body);
+            $this->googleSheetsService
+                ->spreadsheets
+                ->batchUpdate($this->getSpreadsheet()->spreadsheetId, $body)
+            ;
 
             return true;
         } catch (GoogleException $e) {
@@ -103,8 +95,11 @@ class SpreadsheetClient implements SpreadsheetInterface
             'data'             => $data,
         ]);
 
-        $service = new GoogleSheets($this->client);
-        $result  = $service->spreadsheets_values->batchUpdate($this->getSpreadsheet()->spreadsheetId, $body);
+        $result = $this->googleSheetsService
+            ->spreadsheets_values
+            ->batchUpdate($this->getSpreadsheet()
+            ->spreadsheetId, $body)
+        ;
 
         return $result->getTotalUpdatedRows();
     }
