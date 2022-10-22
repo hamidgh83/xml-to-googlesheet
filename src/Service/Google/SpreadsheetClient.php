@@ -44,7 +44,8 @@ class SpreadsheetClient implements SpreadsheetInterface
     }
 
     /**
-     * Creates a new sheet and returns its title.
+     * Given a sheet name it creates a new sheet.
+     * It returns true if the sheet name already exists.
      */
     public function addSheet(string $name): bool
     {
