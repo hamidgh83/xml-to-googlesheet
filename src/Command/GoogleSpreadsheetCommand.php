@@ -19,15 +19,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class GoogleSpreadsheetCommand extends Command
 {
-    protected XMLReader $xmlReaderService;
-
-    protected SpreadsheetClient $spreadsheetClient;
-
-    public function __construct(XMLReader $xmlReaderService, SpreadsheetClient $spreadsheetClient)
-    {
+    public function __construct(
+        protected XMLReader $xmlReaderService,
+        protected SpreadsheetClient $spreadsheetClient
+    ) {
         parent::__construct();
-        $this->xmlReaderService  = $xmlReaderService;
-        $this->spreadsheetClient = $spreadsheetClient;
     }
 
     protected function configure(): void

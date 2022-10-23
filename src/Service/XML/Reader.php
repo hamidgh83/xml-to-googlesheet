@@ -10,20 +10,14 @@ use Symfony\Component\DomCrawler\Crawler;
 class Reader
 {
     /**
-     * Symfony Crawler.
-     */
-    protected Crawler $crawler;
-
-    protected LoggerInterface $logger;
-
-    /**
      * XML parsed items.
      */
     private array $items = [];
 
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected Crawler $crawler,
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**
@@ -41,7 +35,6 @@ class Reader
             throw new RuntimeException('Cannot load the file content. Please check your file path and try again.');
         }
 
-        $this->crawler = new Crawler();
         $this->crawler->addXmlContent($xmlContent);
         $this->crawler = $this->crawler->filterXPath('//catalog/item');
 
